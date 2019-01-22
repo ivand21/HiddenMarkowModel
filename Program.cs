@@ -6,21 +6,43 @@ using System.Threading.Tasks;
 
 namespace HiddenMarkowModel
 {
-    class Program
+    public class Program
     {
+        public enum State { Fair, Loaded };
+
+        public const int STATES_COUNT = 2;
+        public const int NUMBERS_COUNT = 6;
+
+        public const int TRAINING_SET_COUNT = 10;
+
         static void Main(string[] args)
         {
-            //var h = new HiddenMarkowModel();
-            Simulate();
+            var trainingSet = CreateTrainingSet(TRAINING_SET_COUNT);
+            var hmm = new HMM(trainingSet);
+            hmm.TrainBaumWelch();
+            hmm.PrettyPrintModel();
         }
 
-        static void Simulate()
+        static List<int[]> CreateTrainingSet(int count)
+        {
+            var set = new List<int[]>();
+            for (int i=0; i<count; i++)
+            {
+                var sequence = Simulate();
+                set.Add(sequence);
+            }
+
+            return set;
+        }
+
+        static int[] Simulate()
         {
             bool isFair = true;
+            List<int> results = new List<int>();
             double[] unfairProbabilities = new double[] { 0.1, 0.1, 0.1, 0.1, 0.1, 0.5 };
-            double swapToFairProb = 0.1;
-            double swapToUnfairProb = 0.05;
-            const int ROLLS_NO = 1000;
+            double swapToFairProb = 0.05;
+            double swapToUnfairProb = 0.1;
+            const int ROLLS_NO = 100;
             Random rnd = new Random();
 
             for (int i = 0; i < ROLLS_NO; i++)
@@ -32,7 +54,7 @@ namespace HiddenMarkowModel
                     if (CheckDiceSwap(rnd, swapToUnfairProb))
                     {
                         isFair = false;
-                        Console.WriteLine("Zaczynam kantować!");
+                        //Console.WriteLine("Zaczynam kantować!");
                     }
                 }
                 else
@@ -41,16 +63,19 @@ namespace HiddenMarkowModel
                     if (CheckDiceSwap(rnd, swapToFairProb))
                     {
                         isFair = true;
-                        Console.WriteLine("Już będę uczciwy!");
+                        //Console.WriteLine("Już będę uczciwy!");
                     }
                 }
-                Console.Write(result);
+                results.Add(result);
+                //Console.Write(result);
             }
+
+            return results.ToArray();
         }
 
         static int RollFairDice(Random rnd)
         {
-            return rnd.Next(1, 7);
+            return rnd.Next(0, 6);
         }
 
         static int RollUnfairDice(Random rnd, double[] probabilities)
@@ -62,7 +87,7 @@ namespace HiddenMarkowModel
                 sum += probabilities[i];
                 if (sum > randomNumber)
                 {
-                    return i + 1;
+                    return i;
                 }
             }
             return -1;
@@ -72,13 +97,5 @@ namespace HiddenMarkowModel
         {
             return rnd.NextDouble() < prob;
         }
-
-        static void BaumWelch(double[] probFair, double[] probUnfair, double[] probTransition)
-        {
-            //double 
-            //double a0 = 
-        }
-
-
     }
 }
