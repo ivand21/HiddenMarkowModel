@@ -38,14 +38,14 @@ namespace HiddenMarkowModel
 
         public void TrainBaumWelch()
         {
-            double[,] A = new double[Program.STATES_COUNT, Program.STATES_COUNT];
-            double[,] E = new double[Program.NUMBERS_COUNT, Program.STATES_COUNT];
+            double[,] A = new double[Casino.STATES_COUNT, Casino.STATES_COUNT];
+            double[,] E = new double[Casino.NUMBERS_COUNT, Casino.STATES_COUNT];
             double[] P = new double[sequences.Count];
 
             for (int it = 0; it < BAUM_WELCH_ITERATIONS; it++)
             {
-                var newA = new double[Program.STATES_COUNT, Program.STATES_COUNT];
-                var newE = new double[Program.NUMBERS_COUNT, Program.STATES_COUNT];
+                var newA = new double[Casino.STATES_COUNT, Casino.STATES_COUNT];
+                var newE = new double[Casino.NUMBERS_COUNT, Casino.STATES_COUNT];
 
                 for (int j = 0; j < sequences.Count; j++)
                 {
@@ -60,7 +60,7 @@ namespace HiddenMarkowModel
                         newA[0, 1] += (f[i, 0] * a[0, 1] * e[seq[i + 1], 1] * b[i + 1, 1]) / P[j];
                         newA[1, 0] += (f[i, 1] * a[1, 0] * e[seq[i + 1], 0] * b[i + 1, 0]) / P[j];
                         newA[1, 1] += (f[i, 1] * a[1, 1] * e[seq[i + 1], 1] * b[i + 1, 1]) / P[j];
-                        for (int x = 0; x < Program.NUMBERS_COUNT; x++)
+                        for (int x = 0; x < Casino.NUMBERS_COUNT; x++)
                         {
                             if (seq[i] == x)
                             {
@@ -78,17 +78,17 @@ namespace HiddenMarkowModel
                 double totalE0 = 0.0d;
                 double totalE1 = 0.0d;
 
-                for (int i = 0; i < Program.NUMBERS_COUNT; i++)
+                for (int i = 0; i < Casino.NUMBERS_COUNT; i++)
                 {
                     totalE0 += E[i, 0];
                     totalE1 += E[i, 1];
                 }
 
-                for (int k = 0; k < Program.STATES_COUNT; k++)
+                for (int k = 0; k < Casino.STATES_COUNT; k++)
                 {
                     a[k, 0] = A[k, 0] / (A[k, 0] + A[k, 1]);
                     a[k, 1] = A[k, 1] / (A[k, 0] + A[k, 1]);
-                    for (int i = 0; i < Program.NUMBERS_COUNT; i++)
+                    for (int i = 0; i < Casino.NUMBERS_COUNT; i++)
                     {
                         e[i, 0] = E[i, 0] / totalE0;
                         e[i, 1] = E[i, 1] / totalE1;
@@ -137,10 +137,10 @@ namespace HiddenMarkowModel
 
         private double[,] CountPrefix(int[] sequence)
         {
-            var f = new double[sequence.Length, Program.STATES_COUNT];
+            var f = new double[sequence.Length, Casino.STATES_COUNT];
             f[0, 0] = 1;
             f[0, 1] = 0;
-            for (int k = 0; k < Program.STATES_COUNT; k++)
+            for (int k = 0; k < Casino.STATES_COUNT; k++)
             {
                 for (int i = 1; i < sequence.Length; i++)
                 {
@@ -154,10 +154,10 @@ namespace HiddenMarkowModel
 
         private double[,] CountSufix(int[] sequence)
         {
-            var b = new double[sequence.Length, Program.STATES_COUNT];
+            var b = new double[sequence.Length, Casino.STATES_COUNT];
             b[sequence.Length - 1, 0] = 1;
             b[sequence.Length - 1, 1] = 1;
-            for (int k = 0; k < Program.STATES_COUNT; k++)
+            for (int k = 0; k < Casino.STATES_COUNT; k++)
             {
                 for (int i = sequence.Length - 2; i >= 0; i--)
                 {
